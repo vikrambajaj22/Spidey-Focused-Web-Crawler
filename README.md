@@ -1,4 +1,4 @@
-# Spidey: Focused Web Crawler
+# Spidey: A Focused Web Crawler
 A focused web crawler using Python
 
 
