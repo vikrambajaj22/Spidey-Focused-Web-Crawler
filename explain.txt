@@ -1,0 +1,74 @@
+CS-GY 6913: Web Search Engines - Assignment 1 - Focused Crawler
+===============================================================
+Vikram Sunil Bajaj (vsb259)
+
+NOTE:
+=====
+The results correspond to spidey.py
+spidey_multiThread.py is only for reviewing, and may have unexpected errors. (detailed in 'MultiThreading" below).
+
+How the code works:
+===================
+1. Take inputs from the user (detailed in readme.txt)
+2. Obtain start pages
+3. Enqueue start pages, assuming that all start pages are equally promising
+4. Create a new Crawler object
+5. Dequeue a link from the queue, in decreasing order of promise
+6. Parse the link, extract a fixed number of links from the page and compute their promises, enqueue them (if a link is already in the queue, update its promise using the relevance of the parent link)
+6. Compute the relevance of the parsed page and add it to parsed links dictionary
+7. Repeat steps 4 to 6 till we have crawled the required number of pages or the queue becomes empty
+
+Main Data Structures used:
+==========================
+1. Priority Queue: to store the links to be parsed
+2. Dictionary: to store parsed links (as keys) along with information such as its promise, relevance, number of child links, size, status code and time of crawled
+
+Main Classes:
+=============
+PriorityQueue: for the priority queue
+ParsedURLs: for the dictionary
+Crawler: for the crawler
+
+Main Functions:
+===============
+1. pre_validate_url(): checks if a link contains certain words (javascript, cgi ...) and/or has invalid file types (.mp4, .avi, .pdf ...) before it can be enqueued
+1. validate_url(): checks if a link can be crawled, by checking the status code, robots.txt file, and MIME type, upon dequeueing it
+2. visit_url(): to crawl the page and return a set of pre-validiated normalized links in the page and the page's HTML text
+3. get_synonyms_and_lemmatized(): returns the synonyms and lemmatized form of the query terms using nltk
+4. get_promise(): computes the promise of a link based on the URL, before the URL can be crawled; makes use of synonyms and lemmatized forms of query terms as well; also makes use of the parent link's relevance score; promise is normalized by the URL length
+5. get_relevance(): computes the relevance of a link after visiting the page; uses synonyms, lemmatized forms as well; checks title, headings, anchor tags, bold text and the remaining text
+6. get_harvest_rate(): computes the harvest rate
+7. create_log(): creates the log file
+
+Packages Used:
+==============
+requests
+bs4 (for BeautifulSoup)
+urllib
+nltk
+datetime
+url_normalize
+time
+string
+collections
+
+Known Bugs:
+===========
+1. Speed: The crawler isn't very fast; It parses 1000 links in about 30 minutes
+   
+MultiThreading:
+===============
+I tried a multi-threaded approach that was a bit faster at crawling. This code is in spidey_multiThread.py.
+However, nltk (used while computing promise and relevance) isn't built for multi-threading, so there were unexpected errors.
+Also, since the threads were dequeueing links and parsing them separately, the order in which links were being parsed was different from expected, some links were taking longer to be parsed.
+Therefore, I decided to submit a single-thread approach.
+
+Extra Features:
+===============
+1. Natural Language Processing:
+   ----------------------------
+   nltk (mostly nltk's interface for WordNet) was used while computing the promise and relevance, by determining synonyms and lemmatized forms of the terms in the query.
+2. <base> tags:
+   ------------
+   The <base> tag of a page was checked to determine a base URL, before attempting to use urljoin
+3. Partial attempt at MultiThreading (detailed above).
